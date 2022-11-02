@@ -56,6 +56,7 @@ function getAllPossibleCombinations(numbers) {
                 validCombinations.push(current);
         }
     }
+    return validCombinations;
 }
 
 function getAllPossibleCombinationsRecursive(numbers) {
@@ -78,6 +79,7 @@ function getAllPossibleCombinationsRecursive(numbers) {
                 combinations.push(currentComb.slice());
             }
         }
+        console.log(currentNode);
         return combinations;
     }
 }

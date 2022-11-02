@@ -17,6 +17,7 @@ async function run() {
     numbers.push(numbers[numbers.length -1] + 3); // built in adapter.
 
     part1(numbers);
+    part2(numbers);
 } 
 
 function part1(numbers) {
@@ -31,12 +32,54 @@ function part1(numbers) {
         } else if (diff == 3) {
             count3s ++;
         } else {
-            console.log('diff between ' + numbers[i+1] + ' and ' + numbers[i] + ' is not 1 or 3.');
+            // console.log('diff between ' + numbers[i+1] + ' and ' + numbers[i] + ' is not 1 or 3.');
         }
     }
-    console.log('Differences of 1:' + count1s);
-    console.log('Differences of 3:' + count3s);
+    // console.log('Differences of 1:' + count1s);
+    // console.log('Differences of 3:' + count3s);
     console.log('Part 1 Result: ' + (count1s * count3s));
+}
+
+function part2(numbers) {
+    numbers.sort((a, b) => b - a);
+    console.log("Number Of Possible Combinations:" + getAllPossibleCombinations(numbers).length);
+}
+
+function getAllPossibleCombinations(numbers) {
+    let allPossibilities = getAllPossibleCombinationsRecursive(numbers);
+    let validCombinations = [];
+    for(let i = 0; i < allPossibilities.length; i++) {
+        let current = allPossibilities[i];
+        // filter out all incomplete records.
+        if (current[0] == numbers[0] && 
+            current[current.length -1] == numbers[numbers.length - 1]) {
+                validCombinations.push(current);
+        }
+    }
+}
+
+function getAllPossibleCombinationsRecursive(numbers) {
+    if (numbers.length == 1) {
+        return [ numbers ];
+    } else {
+        let combinations = [];
+        let subNumbers = numbers.slice();
+        let currentNode = subNumbers.shift();
+        let childCombinations = getAllPossibleCombinationsRecursive(subNumbers);
+        for(let i = 0; i < childCombinations.length; i++) {
+            let currentComb = childCombinations[i];
+            let diff = currentNode - currentComb[0];
+            if (diff == 1 || diff == 2 || diff == 3) {
+                let temp = currentComb.slice();
+                temp.unshift(currentNode);
+                combinations.push(temp);
+            }
+            if (diff <= 4) {
+                combinations.push(currentComb.slice());
+            }
+        }
+        return combinations;
+    }
 }
 
 run();

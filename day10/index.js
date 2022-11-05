@@ -1,8 +1,5 @@
 var Promise = require('bluebird');
-const { ChildProcess } = require('child_process');
-const { join } = require('path');
 var fs = Promise.promisifyAll(require('fs'));
-let preambleLength = 25;
 
 async function run() {
     console.log('Loading and parsing the input file...');

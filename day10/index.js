@@ -1,4 +1,6 @@
 var Promise = require('bluebird');
+const { ChildProcess } = require('child_process');
+const { join } = require('path');
 var fs = Promise.promisifyAll(require('fs'));
 let preambleLength = 25;
 
@@ -41,47 +43,49 @@ function part1(numbers) {
 }
 
 function part2(numbers) {
-    numbers.sort((a, b) => b - a);
-    console.log("Number Of Possible Combinations:" + getAllPossibleCombinations(numbers).length);
+    console.log("Part 2 Results:" + countAllPossibleCombinations(numbers));
 }
 
-function getAllPossibleCombinations(numbers) {
-    let allPossibilities = getAllPossibleCombinationsRecursive(numbers);
-    let validCombinations = [];
+function countAllPossibleCombinations(numbers) {
+    let allPossibilities = countAllPossibleCombinationsRecursive(numbers);
     for(let i = 0; i < allPossibilities.length; i++) {
         let current = allPossibilities[i];
-        // filter out all incomplete records.
-        if (current[0] == numbers[0] && 
-            current[current.length -1] == numbers[numbers.length - 1]) {
-                validCombinations.push(current);
+        // return correct record count.
+        if (current.startsWith == numbers[0] && 
+            current.endsWith == numbers[numbers.length - 1]) {
+                return current.count;
         }
     }
-    return validCombinations;
+    throw new Error('proper path not found through the adapters.');
 }
 
-function getAllPossibleCombinationsRecursive(numbers) {
+function countAllPossibleCombinationsRecursive(numbers) {
     if (numbers.length == 1) {
-        return [ numbers ];
+        return insertOrUpdate([], {startsWith: numbers[0], endsWith: numbers[0], count: 1});
     } else {
-        let combinations = [];
         let subNumbers = numbers.slice();
         let currentNode = subNumbers.shift();
-        let childCombinations = getAllPossibleCombinationsRecursive(subNumbers);
+        let childCombinations = countAllPossibleCombinationsRecursive(subNumbers);
         for(let i = 0; i < childCombinations.length; i++) {
             let currentComb = childCombinations[i];
-            let diff = currentNode - currentComb[0];
+            let diff = currentComb.startsWith - currentNode;
             if (diff == 1 || diff == 2 || diff == 3) {
-                let temp = currentComb.slice();
-                temp.unshift(currentNode);
-                combinations.push(temp);
-            }
-            if (diff <= 4) {
-                combinations.push(currentComb.slice());
+                insertOrUpdate(childCombinations, {startsWith: currentNode, endsWith: currentComb.endsWith, count: currentComb.count})
             }
         }
-        console.log(currentNode);
-        return combinations;
+        return childCombinations;
     }
+}
+
+function insertOrUpdate(list, value) {
+    for(let i = 0; i < list.length; i++) {
+        if (value.startsWith === list[i].startsWith) {
+            list[i].count += value.count;
+            return;
+        }
+    }
+    list.push(value);
+    return list;
 }
 
 run();
